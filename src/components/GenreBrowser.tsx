@@ -2,41 +2,42 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LoadMoreButton from "@/components/LoadMoreButton";
 import MovieGrid from "@/components/MovieGrid";
 import MovieGridSkeleton from "@/components/MovieGridSkeleton";
 import { flattenUniqueById, getNextPageParam } from "@/lib/pagination";
-import type { SortKey } from "@/lib/sort";
+import { SORT_LABELS, type SortKey } from "@/lib/sort";
+import { discoverMoviesByGenreSort } from "@/lib/tmdb-client";
 import SortSelect from "@/components/SortSelect";
-import type { Genre, Movie, PaginatedResponse } from "@/types/tmdb";
+import type { Genre } from "@/types/tmdb";
 
 const SORT_OPTIONS: SortKey[] = ["popularity", "rating", "release", "title"];
 
-async function fetchDiscover(
-  genreId: number,
-  page: number,
-  sort: SortKey,
-): Promise<PaginatedResponse<Movie>> {
-  const res = await fetch(
-    `/api/discover?genre=${genreId}&sort=${sort}&page=${page}`,
-  );
-  if (!res.ok) throw new Error("Failed to load movies for this genre");
-  return res.json();
+function readGenreFromUrl(): number | null {
+  const genre = new URLSearchParams(window.location.search).get("genre");
+  const id = genre ? Number(genre) : NaN;
+  return Number.isInteger(id) && id > 0 ? id : null;
 }
 
-export default function GenreBrowser({
-  genres,
-  initialGenreId,
-  initialSort,
-}: {
-  genres: Genre[];
-  initialGenreId: number | null;
-  initialSort: SortKey;
-}) {
+function readSortFromUrl(): SortKey {
+  const sort = new URLSearchParams(window.location.search).get("sort");
+  if (sort && sort !== "relevance" && sort in SORT_LABELS) {
+    return sort as SortKey;
+  }
+  return "popularity";
+}
+
+export default function GenreBrowser({ genres }: { genres: Genre[] }) {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState<number | null>(initialGenreId);
-  const [sort, setSort] = useState<SortKey>(initialSort);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [sort, setSort] = useState<SortKey>("popularity");
+
+  // Static export can't read searchParams on the server, so hydrate from the URL.
+  useEffect(() => {
+    setSelectedId(readGenreFromUrl());
+    setSort(readSortFromUrl());
+  }, []);
 
   // Keep the URL in sync so the genre + sort are shareable and survive refresh.
   function syncUrl(genreId: number | null, sortKey: SortKey) {
@@ -70,7 +71,7 @@ export default function GenreBrowser({
   } = useInfiniteQuery({
     queryKey: ["discover", selectedId, sort],
     queryFn: ({ pageParam }) =>
-      fetchDiscover(selectedId as number, pageParam, sort),
+      discoverMoviesByGenreSort(selectedId as number, pageParam, sort),
     initialPageParam: 1,
     getNextPageParam,
     enabled: selectedId !== null,

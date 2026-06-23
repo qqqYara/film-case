@@ -7,8 +7,22 @@ import ImageGallery from "@/components/ImageGallery";
 import MovieGrid from "@/components/MovieGrid";
 import TrailerPlayer from "@/components/TrailerPlayer";
 import WatchlistButton from "@/components/WatchlistButton";
-import { getMovieDetails, tmdbImageUrl } from "@/lib/tmdb";
+import { getMovieDetails, getPopularMovies, getTrendingMovies, tmdbImageUrl } from "@/lib/tmdb";
 import type { MovieDetails, Video } from "@/types/tmdb";
+
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  const [popular, trending] = await Promise.all([
+    getPopularMovies(1),
+    getTrendingMovies("week"),
+  ]);
+  const ids = new Set([
+    ...popular.results.map((movie) => movie.id),
+    ...trending.results.map((movie) => movie.id),
+  ]);
+  return [...ids].map((id) => ({ id: String(id) }));
+}
 
 async function loadMovie(id: string): Promise<MovieDetails | null> {
   const numericId = Number(id);

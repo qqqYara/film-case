@@ -7,15 +7,10 @@ import MovieGrid from "@/components/MovieGrid";
 import SortSelect from "@/components/SortSelect";
 import { flattenUniqueById, getNextPageParam } from "@/lib/pagination";
 import { type SortKey, sortMovies } from "@/lib/sort";
+import { getPopularMovies } from "@/lib/tmdb-client";
 import type { Movie, PaginatedResponse } from "@/types/tmdb";
 
 const SORT_OPTIONS: SortKey[] = ["popularity", "rating", "release", "title"];
-
-async function fetchPopular(page: number): Promise<PaginatedResponse<Movie>> {
-  const res = await fetch(`/api/movies/popular?page=${page}`);
-  if (!res.ok) throw new Error("Failed to load popular movies");
-  return res.json();
-}
 
 export default function PopularMovies({
   initialPage,
@@ -28,7 +23,7 @@ export default function PopularMovies({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["popular"],
-      queryFn: ({ pageParam }) => fetchPopular(pageParam),
+      queryFn: ({ pageParam }) => getPopularMovies(pageParam),
       initialPageParam: 1,
       getNextPageParam,
       // Seed with the page the server already fetched — no refetch on mount.

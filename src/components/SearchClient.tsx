@@ -10,19 +10,8 @@ import { useMounted } from "@/hooks/useMounted";
 import { flattenUniqueById, getNextPageParam } from "@/lib/pagination";
 import { type SortKey, sortMovies } from "@/lib/sort";
 import SortSelect from "@/components/SortSelect";
+import { searchMovies } from "@/lib/tmdb-client";
 import { useRecentSearches } from "@/store/recent-searches";
-import type { Movie, PaginatedResponse } from "@/types/tmdb";
-
-async function fetchSearch(
-  query: string,
-  page: number,
-): Promise<PaginatedResponse<Movie>> {
-  const res = await fetch(
-    `/api/search?q=${encodeURIComponent(query)}&page=${page}`,
-  );
-  if (!res.ok) throw new Error("Search request failed");
-  return res.json();
-}
 
 const SORT_OPTIONS: SortKey[] = [
   "relevance",
@@ -53,7 +42,7 @@ export default function SearchClient() {
     isError,
   } = useInfiniteQuery({
     queryKey: ["search", trimmed],
-    queryFn: ({ pageParam }) => fetchSearch(trimmed, pageParam),
+    queryFn: ({ pageParam }) => searchMovies(trimmed, pageParam),
     initialPageParam: 1,
     getNextPageParam,
     enabled: trimmed.length > 0,
