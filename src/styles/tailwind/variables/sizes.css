@@ -1,0 +1,9 @@
+/* Mirrors the Angular OD_SIZES tokens. The --spacing-* namespace feeds every
+   spacing-based utility, so each value yields w-*, h-*, size-*, p-*, m-*, gap-*. */
+@theme {
+  --spacing-xs: 26px;
+  --spacing-sm: 34px;
+  --spacing-md: 42px;
+  --spacing-lg: 50px;
+  --spacing-xl: 58px;
+}
