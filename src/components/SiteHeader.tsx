@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
 import WatchlistNavLink from "@/components/WatchlistNavLink";
 
 const NAV_LINKS = [
@@ -47,51 +48,55 @@ export default function SiteHeader() {
           </span>
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden items-center gap-6 text-sm font-medium text-zinc-600 lg:flex dark:text-zinc-300">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-label={link.label}
-              className="transition hover:text-amber-500"
-            >
-              {link.label}
+        <div className="flex items-center gap-1 lg:gap-6">
+          {/* Desktop nav */}
+          <div className="hidden items-center gap-6 text-sm font-medium text-zinc-600 lg:flex dark:text-zinc-300">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-label={link.label}
+                className="transition hover:text-amber-500"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <WatchlistNavLink />
+            <Link href="/about" aria-label="About" className="transition hover:text-amber-500">
+              About
             </Link>
-          ))}
-          <WatchlistNavLink />
-          <Link href="/about" aria-label="About" className="transition hover:text-amber-500">
-            About
-          </Link>
-        </div>
+          </div>
 
-        {/* Mobile / tablet toggle */}
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? "Close menu" : "Open menu"}
-          className="relative z-30 flex h-10 w-10 items-center justify-center rounded-md text-zinc-600 transition hover:bg-black/5 hover:text-amber-500 lg:hidden dark:text-zinc-300 dark:hover:bg-white/10"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-6 w-6"
-            aria-hidden="true"
+          <ThemeToggle />
+
+          {/* Mobile / tablet toggle */}
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="relative z-30 flex h-10 w-10 items-center justify-center rounded-md text-zinc-600 transition hover:bg-black/5 hover:text-amber-500 lg:hidden dark:text-zinc-300 dark:hover:bg-white/10"
           >
-            {open ? (
-              <path d="M6 6l12 12M18 6L6 18" />
-            ) : (
-              <path d="M4 7h16M4 12h16M4 17h16" />
-            )}
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-6 w-6"
+              aria-hidden="true"
+            >
+              {open ? (
+                <path d="M6 6l12 12M18 6L6 18" />
+              ) : (
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              )}
+            </svg>
+          </button>
+        </div>
       </nav>
 
       {/* Full-screen mobile / tablet menu */}

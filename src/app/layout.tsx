@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import Providers from "./providers";
 import SiteHeader from "@/components/SiteHeader";
+import { themeInitScript } from "@/lib/theme";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +29,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-black">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-P3LTJYV0W1"

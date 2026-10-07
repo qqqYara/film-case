@@ -4,3 +4,5 @@
 @import "../styles/tailwind/variables/colors.css";
 @import "../styles/tailwind/variables/sizes.css";
 @import "../styles/tailwind/variables/typography.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
